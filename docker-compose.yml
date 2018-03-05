@@ -1,0 +1,8 @@
+version: '2'
+
+services:
+    ro-analyze-api:
+        container_name: ro-analyze-api
+        build: .
+        ports:
+            - 80:80
