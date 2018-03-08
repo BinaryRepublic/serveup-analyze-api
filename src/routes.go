@@ -2,7 +2,7 @@ package main
 
 import (
 	"net/http"
-	"./controller"
+	"controller"
 	"github.com/gorilla/mux"
 )
 
