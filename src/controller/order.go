@@ -5,6 +5,7 @@ import (
 	"helper"
 	"strconv"
 	"encoding/json"
+	"os"
 )
 
 var Config = helper.ReadConfig()
@@ -34,8 +35,11 @@ func GetOrder(res http.ResponseWriter, req *http.Request) {
 		json.Unmarshal(res, &orders)
 
 		for index := range orders {
+			soundFilePath := Config.SoundFiles.Path + orders[index].Id + "." + Config.SoundFiles.Type
 			order := &orders[index]
-			order.SoundFilePath = order.Id + ".mp3"
+			if _, err := os.Stat(soundFilePath); err == nil {
+				order.SoundFilePath = soundFilePath
+			}
 		}
 
 		return orders
@@ -50,9 +54,13 @@ func PostOrder(res http.ResponseWriter, req *http.Request) {
 		getQuery["id"] = params["order-id"]
 		resp := helper.HttpGet(orderApiUrl + "/order", getQuery)
 
-		var orderItem order
-		json.Unmarshal(resp, &orderItem)
-		orderItem.SoundFilePath = params["order-id"] + ".mp3"
-		return orderItem
+		filename := helper.HttpSaveFile(res, req, Config.SoundFiles.Path + params["order-id"] + "." + Config.SoundFiles.Type)
+		if filename != "" {
+			var orderItem order
+			json.Unmarshal(resp, &orderItem)
+			orderItem.SoundFilePath = filename
+			return orderItem
+		}
+		return nil
 	})
 }

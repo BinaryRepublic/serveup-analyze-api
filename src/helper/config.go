@@ -10,8 +10,13 @@ type orderApi struct {
 	Host		string
 	Port		int
 }
+type soundFiles struct {
+	Path		string
+	Type		string
+}
 type config struct {
 	OrderApi	orderApi
+	SoundFiles	soundFiles
 }
 
 func ReadConfig() config {

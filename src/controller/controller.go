@@ -21,7 +21,7 @@ func HandleMessage(required []string, res http.ResponseWriter, req *http.Request
 	params = parseJSON(params, req)
 
 	// validate params
-	missing := validateRequest(params, required)
+	missing := validateRequest(params, required, req)
 
 	if len(missing) == 0 {
 		json.NewEncoder(res).Encode(controllerFn(params))
@@ -34,7 +34,7 @@ func HandleMessage(required []string, res http.ResponseWriter, req *http.Request
 func parseForm(params map[string]string, request *http.Request) (newParams map[string]string) {
 	newParams = params
 	// parse query and body params
-	request.ParseForm()
+	request.ParseMultipartForm(32 << 20)
 	// convert map[string][]string to map[string]string
 	formParams := request.Form
 	for key, value := range formParams {
@@ -52,11 +52,15 @@ func parseJSON(params map[string]string, request *http.Request) (newParams map[s
 	return
 }
 
-func validateRequest(params map[string]string, required []string) []string {
+func validateRequest(params map[string]string, required []string, request *http.Request) []string {
 	var missing []string
 	for _, requiredItem := range required {
 		if params[requiredItem] == "" {
-			missing = append(missing, requiredItem)
+			// check if file
+			_, _, err := request.FormFile(requiredItem)
+			if err != nil {
+				missing = append(missing, requiredItem)
+			}
 		}
 	}
 	return missing

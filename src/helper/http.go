@@ -7,6 +7,8 @@ import (
 	"io/ioutil"
 	"encoding/json"
 	"bytes"
+	"os"
+	"io"
 )
 
 func HttpQueryParams(req *http.Request) (getParams map[string]string) {
@@ -15,6 +17,24 @@ func HttpQueryParams(req *http.Request) (getParams map[string]string) {
 		getParams[key] = value[0]
 	}
 	return
+}
+
+func HttpSaveFile(res http.ResponseWriter, req *http.Request, path string) (filename string) {
+	file, handler, err := req.FormFile("soundfile")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	defer file.Close()
+	fmt.Fprintf(res, "%v", handler.Header)
+	f, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE, 0666)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	defer f.Close()
+	io.Copy(f, file)
+	return f.Name()
 }
 
 func HttpGet(url string, params map[string]string) []byte {
