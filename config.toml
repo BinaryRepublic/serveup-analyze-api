@@ -1,5 +1,5 @@
 [orderApi]
-host = "http://order-api"
+host = "http://order-api-dev"
 port = 3000
 
 [soundFiles]
