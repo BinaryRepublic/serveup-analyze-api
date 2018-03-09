@@ -6,5 +6,5 @@ RUN mkdir ../soundfiles
 RUN go get "github.com/gorilla/mux"
 RUN go get "github.com/BurntSushi/toml"
 RUN go build main.go routes.go
-ENV PATH=/go/src
-CMD ["main"]
+ENV GOPATH=/go/src
+CMD ["/go/src/main"]
