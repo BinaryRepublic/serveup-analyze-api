@@ -49,7 +49,6 @@ func HttpGet(url string, params map[string]string) []byte {
 		queryStr = ""
 	}
 	response, err := http.Get(url + queryStr)
-	fmt.Println(url + queryStr)
 	if  err != nil {
 		fmt.Println(err)
 	} else {
