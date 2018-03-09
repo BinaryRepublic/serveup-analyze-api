@@ -6,7 +6,6 @@ import (
 	"strconv"
 	"encoding/json"
 	"os"
-	"fmt"
 )
 
 var orderApiUrl = Config.OrderApi.Host + ":" + strconv.Itoa(Config.OrderApi.Port)
@@ -33,7 +32,6 @@ func GetOrder(res http.ResponseWriter, req *http.Request) {
 		res := helper.HttpGet(orderApiUrl + "/order/restaurant", helper.HttpQueryParams(req))
 		var orders []order
 		json.Unmarshal(res, &orders)
-		fmt.Println(orders)
 		for index := range orders {
 			soundFilePath := Config.SoundFiles.Path + orders[index].Id + "." + Config.SoundFiles.Type
 			order := &orders[index]
@@ -53,14 +51,20 @@ func PostOrder(res http.ResponseWriter, req *http.Request) {
 		getQuery := make(map[string]string)
 		getQuery["id"] = params["order-id"]
 		resp := helper.HttpGet(orderApiUrl + "/order", getQuery)
+		var orderItem order
+		json.Unmarshal(resp, &orderItem)
 
-		filename := helper.HttpSaveFile(res, req, Config.SoundFiles.Path + params["order-id"] + "." + Config.SoundFiles.Type)
-		if filename != "" {
-			var orderItem order
-			json.Unmarshal(resp, &orderItem)
-			orderItem.SoundFilePath = filename
-			return orderItem
+		fullPath := Config.SoundFiles.Path + params["order-id"] + "." + Config.SoundFiles.Type
+
+		if orderItem.Id != "" {
+			if _, err := os.Stat(fullPath); os.IsNotExist(err) {
+				filename := helper.HttpSaveFile(res, req, fullPath)
+				if filename != "" {
+					orderItem.SoundFilePath = filename
+					return orderItem
+				}
+			}
 		}
-		return nil
+		return false
 	})
 }
