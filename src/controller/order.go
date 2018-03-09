@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"encoding/json"
 	"os"
+	"fmt"
 )
 
 var orderApiUrl = Config.OrderApi.Host + ":" + strconv.Itoa(Config.OrderApi.Port)
@@ -32,7 +33,7 @@ func GetOrder(res http.ResponseWriter, req *http.Request) {
 		res := helper.HttpGet(orderApiUrl + "/order/restaurant", helper.HttpQueryParams(req))
 		var orders []order
 		json.Unmarshal(res, &orders)
-
+		fmt.Println(orders)
 		for index := range orders {
 			soundFilePath := Config.SoundFiles.Path + orders[index].Id + "." + Config.SoundFiles.Type
 			order := &orders[index]
