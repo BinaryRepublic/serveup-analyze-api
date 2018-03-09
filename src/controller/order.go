@@ -8,7 +8,6 @@ import (
 	"os"
 )
 
-var Config = helper.ReadConfig()
 var orderApiUrl = Config.OrderApi.Host + ":" + strconv.Itoa(Config.OrderApi.Port)
 
 type orderItem struct {

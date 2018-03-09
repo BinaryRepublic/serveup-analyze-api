@@ -3,5 +3,6 @@ host = "http://138.68.71.39"
 port = 3000
 
 [soundFiles]
-path = "/go/src/soundfiles/"
+# path = "/go/soundfiles/"
+path = "C:/Users/Laptop/Desktop/project-env/code-restaurant-order/ro-analyze-api/soundfiles/"
 type = "wav"
