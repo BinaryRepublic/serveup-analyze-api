@@ -8,6 +8,7 @@ import (
 	"github.com/gorilla/mux"
 	"helper"
 	"strings"
+	"os"
 )
 
 var Config = helper.ReadConfig()
@@ -31,7 +32,14 @@ func HandleMessage(required []string, res http.ResponseWriter, req *http.Request
 	if len(missing) == 0 {
 		jsonResult := controllerFn(params)
 		if jsonResult != false {
+			if jsonResult == nil {
+				jsonResult = map[string]string{}
+			}
+			// 200 SUCCESS
 			json.NewEncoder(res).Encode(jsonResult)
+		} else {
+			// 500 INTERNAL
+			res.WriteHeader(http.StatusInternalServerError)
 		}
 	} else {
 		for _, missingItem := range missing {
@@ -81,12 +89,16 @@ func validateRequest(params map[string]string, required []string, request *http.
 	return missing
 }
 
-func FileResponse(res http.ResponseWriter, req *http.Request, filePath string) {
-	middleware.HttpHeadersContentType(res, req, "file")
+func FileResponse(res http.ResponseWriter, req *http.Request, filePath string) bool {
+	if _, err := os.Stat(filePath); err == nil {
+		middleware.HttpHeadersContentType(res, req, "file")
 
-	filePathSplit := strings.Split(filePath, "/")
-	fileName := filePathSplit[len(filePathSplit)-1]
+		filePathSplit := strings.Split(filePath, "/")
+		fileName := filePathSplit[len(filePathSplit)-1]
 
-	res.Header().Set("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
-	http.ServeFile(res, req, filePath)
+		res.Header().Set("Content-Disposition", "attachment; filename=\""+fileName+"\"")
+		http.ServeFile(res, req, filePath)
+		return true
+	}
+	return false
 }
