@@ -1,9 +1,22 @@
-[orderApi]
-# host = "http://138.68.71.39"
-host = "http://order-api-dev"
-port = 3000
+[dev]
+    [dev.orderApi]
+        host = "http://order-api-dev"
+        port = 3000
+    [dev.soundFiles]
+        path = "/go/soundfiles/"
+        type = "wav"
 
-[soundFiles]
-path = "/go/soundfiles/"
-# path = "C:/Users/Laptop/Desktop/project-env/code-restaurant-order/ro-analyze-api/soundfiles/"
-type = "wav"
+[prod]
+    [prod.orderApi]
+        host = "http://order-api"
+        port = 3000
+    [prod.soundFiles]
+        path = "/go/soundfiles/"
+        type = "wav"
+
+[local0]
+    [local0.orderApi]
+        host = "http://138.68.71.39"
+    [local0.soundFiles]
+        path = "C:/Users/Laptop/Desktop/project-env/code-restaurant-order/ro-analyze-api/soundfiles/"
+        type = "wav"
