@@ -9,6 +9,7 @@ import (
 	"bytes"
 	"os"
 	"io"
+	"strconv"
 )
 
 func HttpQueryParams(req *http.Request) (getParams map[string]string) {
@@ -48,7 +49,8 @@ func HttpGet(url string, params map[string]string) []byte {
 	} else {
 		queryStr = ""
 	}
-	response, err := http.Get(url + queryStr)
+	url = url + queryStr
+	response, err := http.Get(url)
 	if  err != nil {
 		fmt.Println(err)
 	} else {
@@ -59,7 +61,7 @@ func HttpGet(url string, params map[string]string) []byte {
 			}
 			return []byte(body)
 		} else {
-			fmt.Println("GET " + url + " - Statuscode " + string(response.StatusCode))
+			fmt.Println("GET " + url + " - Statuscode " + strconv.Itoa(response.StatusCode))
 		}
 	}
 	return nil
@@ -84,7 +86,7 @@ func HttpPost(url string, params map[string]interface{}) []byte {
 		}
 		return []byte(body)
 	} else {
-		fmt.Println("POST " + url + " - Statuscode " + string(response.StatusCode))
+		fmt.Println("POST " + url + " - Statuscode " + strconv.Itoa(response.StatusCode))
 	}
 	return nil
 }
