@@ -75,7 +75,7 @@ func PostOrder(res http.ResponseWriter, req *http.Request) {
 			if _, err := os.Stat(fullPath); os.IsNotExist(err) {
 				filename := helper.HttpSaveFile(res, req, fullPath)
 				if filename != "" {
-					orderItem.SoundFilePath = filename
+					orderItem.SoundFilePath = helper.SoundFileUrl(req, params["order-id"])
 					return orderItem
 				}
 			}
