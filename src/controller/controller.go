@@ -38,13 +38,17 @@ func HandleMessage(required []string, res http.ResponseWriter, req *http.Request
 			// 200 SUCCESS
 			json.NewEncoder(res).Encode(jsonResult)
 		} else {
-			// 500 INTERNAL
-			res.WriteHeader(http.StatusInternalServerError)
+			if res.Header().Get("Content-Type") == "application/json" {
+				// 500 INTERNAL
+				res.WriteHeader(http.StatusInternalServerError)
+			}
 		}
 	} else {
 		for _, missingItem := range missing {
 			fmt.Println("missing value: ", missingItem)
 		}
+		// 500 INTERNAL
+		res.WriteHeader(http.StatusInternalServerError)
 	}
 }
 func parseForm(params map[string]string, request *http.Request) (newParams map[string]string) {
