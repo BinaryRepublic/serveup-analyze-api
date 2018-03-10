@@ -52,11 +52,15 @@ func HttpGet(url string, params map[string]string) []byte {
 	if  err != nil {
 		fmt.Println(err)
 	} else {
-		body, err := ioutil.ReadAll(response.Body)
-		if err != nil {
-			panic(err.Error())
+		if response.StatusCode == 200 {
+			body, err := ioutil.ReadAll(response.Body)
+			if err != nil {
+				panic(err.Error())
+			}
+			return []byte(body)
+		} else {
+			fmt.Println("GET " + url + " - Statuscode " + string(response.StatusCode))
 		}
-		return []byte(body)
 	}
 	return nil
 }
@@ -73,9 +77,14 @@ func HttpPost(url string, params map[string]interface{}) []byte {
 		fmt.Println(err)
 		return nil
 	}
-	body, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		panic(err.Error())
+	if response.StatusCode == 200 {
+		body, err := ioutil.ReadAll(response.Body)
+		if err != nil {
+			panic(err.Error())
+		}
+		return []byte(body)
+	} else {
+		fmt.Println("POST " + url + " - Statuscode " + string(response.StatusCode))
 	}
-	return []byte(body)
+	return nil
 }

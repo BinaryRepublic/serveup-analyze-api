@@ -44,16 +44,20 @@ func GetOrderById(res http.ResponseWriter, req *http.Request) {
 func GetOrderByRestaurant(res http.ResponseWriter, req *http.Request) {
 	HandleMessage([]string{"restaurant-id"}, res, req, func(params map[string]string) interface{} {
 		res := helper.HttpGet(orderApiUrl + "/order/restaurant", helper.HttpQueryParams(req))
-		var orders []order
-		json.Unmarshal(res, &orders)
-		for index := range orders {
-			soundFilePath := Config.SoundFiles.Path + orders[index].Id + "." + Config.SoundFiles.Type
-			order := &orders[index]
-			if _, err := os.Stat(soundFilePath); err == nil {
-				order.SoundFilePath = helper.SoundFileUrl(req, orders[index].Id)
+		if res != nil {
+			var orders []order
+			json.Unmarshal(res, &orders)
+			for index := range orders {
+				soundFilePath := Config.SoundFiles.Path + orders[index].Id + "." + Config.SoundFiles.Type
+				order := &orders[index]
+				if _, err := os.Stat(soundFilePath); err == nil {
+					order.SoundFilePath = helper.SoundFileUrl(req, orders[index].Id)
+				}
 			}
+			return orders
+		} else {
+			return false
 		}
-		return orders
 	})
 }
 
