@@ -17,6 +17,7 @@
 [local0]
     [local0.orderApi]
         host = "http://138.68.71.39"
+        port = 3000
     [local0.soundFiles]
         path = "C:/Users/Laptop/Desktop/project-env/code-restaurant-order/ro-analyze-api/soundfiles/"
         type = "wav"
