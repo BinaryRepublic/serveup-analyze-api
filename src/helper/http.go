@@ -21,13 +21,12 @@ func HttpQueryParams(req *http.Request) (getParams map[string]string) {
 }
 
 func HttpSaveFile(res http.ResponseWriter, req *http.Request, path string) (filename string) {
-	file, handler, err := req.FormFile("soundfile")
+	file, _, err := req.FormFile("soundfile")
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 	defer file.Close()
-	fmt.Fprintf(res, "%v", handler.Header)
 	f, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE, 0666)
 	if err != nil {
 		fmt.Println(err)
