@@ -40,7 +40,13 @@ var routes = Routes{
 		"GetOrder",
 		"GET",
 		"/order",
-		controller.GetOrder,
+		controller.GetOrderById,
+	},
+	Route{
+		"GetOrder",
+		"GET",
+		"/order/restaurant",
+		controller.GetOrderByRestaurant,
 	},
 	Route{
 		"GetSoundFile",

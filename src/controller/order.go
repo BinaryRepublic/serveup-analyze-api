@@ -26,8 +26,22 @@ type order struct {
 	SoundFilePath string      `json:"soundfile-path"`
 }
 
-func GetOrder(res http.ResponseWriter, req *http.Request) {
-
+func GetOrderById(res http.ResponseWriter, req *http.Request) {
+	HandleMessage([]string{"id"}, res, req, func(params map[string]string) interface{} {
+		res := helper.HttpGet(orderApiUrl + "/order", helper.HttpQueryParams(req))
+		var orderItem order
+		json.Unmarshal(res, &orderItem)
+		if orderItem.Id != "" {
+			soundFilePath := Config.SoundFiles.Path + orderItem.Id + "." + Config.SoundFiles.Type
+			if _, err := os.Stat(soundFilePath); err == nil {
+				orderItem.SoundFilePath = helper.SoundFileUrl(req, orderItem.Id)
+			}
+			return orderItem
+		}
+		return false
+	})
+}
+func GetOrderByRestaurant(res http.ResponseWriter, req *http.Request) {
 	HandleMessage([]string{"restaurant-id"}, res, req, func(params map[string]string) interface{} {
 		res := helper.HttpGet(orderApiUrl + "/order/restaurant", helper.HttpQueryParams(req))
 		var orders []order
@@ -36,18 +50,15 @@ func GetOrder(res http.ResponseWriter, req *http.Request) {
 			soundFilePath := Config.SoundFiles.Path + orders[index].Id + "." + Config.SoundFiles.Type
 			order := &orders[index]
 			if _, err := os.Stat(soundFilePath); err == nil {
-				order.SoundFilePath = soundFilePath
+				order.SoundFilePath = helper.SoundFileUrl(req, orders[index].Id)
 			}
 		}
-
 		return orders
 	})
 }
 
 func PostOrder(res http.ResponseWriter, req *http.Request) {
-
 	HandleMessage([]string{"order-id", "soundfile"}, res, req, func(params map[string]string) interface{} {
-
 		getQuery := make(map[string]string)
 		getQuery["id"] = params["order-id"]
 		resp := helper.HttpGet(orderApiUrl + "/order", getQuery)
