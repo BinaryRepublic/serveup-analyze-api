@@ -8,7 +8,7 @@
 
 [prod]
     [prod.orderApi]
-        host = "http://order-api"
+        host = "http://order-api-prod"
         port = 3000
     [prod.soundFiles]
         path = "/go/soundfiles/"

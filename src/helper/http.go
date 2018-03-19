@@ -56,7 +56,7 @@ func HttpGet(url string, params map[string]string) []byte {
 		if response.StatusCode == 200 {
 			body, err := ioutil.ReadAll(response.Body)
 			if err != nil {
-				panic(err.Error())
+				fmt.Println(err.Error())
 			}
 			return []byte(body)
 		} else {
