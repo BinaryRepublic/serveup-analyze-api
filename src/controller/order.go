@@ -28,7 +28,11 @@ type order struct {
 
 func GetOrderById(res http.ResponseWriter, req *http.Request) {
 	HandleMessage([]string{"id"}, res, req, func(params map[string]string) interface{} {
-		res := helper.HttpGet(orderApiUrl + "/order", helper.HttpQueryParams(req))
+		// prepare headers
+		headers := make(map[string]string)
+		headers["Access-Token"] = req.Header.Get("Access-Token")
+		// send request
+		res := helper.HttpGet(orderApiUrl + "/order", headers, helper.HttpQueryParams(req))
 		var orderItem order
 		json.Unmarshal(res, &orderItem)
 		if orderItem.Id != "" {
@@ -43,7 +47,11 @@ func GetOrderById(res http.ResponseWriter, req *http.Request) {
 }
 func GetOrderByRestaurant(res http.ResponseWriter, req *http.Request) {
 	HandleMessage([]string{"restaurant-id"}, res, req, func(params map[string]string) interface{} {
-		res := helper.HttpGet(orderApiUrl + "/order/restaurant", helper.HttpQueryParams(req))
+		// prepare headers
+		headers := make(map[string]string)
+		headers["Access-Token"] = req.Header.Get("Access-Token")
+		// send request
+		res := helper.HttpGet(orderApiUrl + "/order/restaurant", headers, helper.HttpQueryParams(req))
 		if res != nil {
 			var orders []order
 			json.Unmarshal(res, &orders)
@@ -63,9 +71,13 @@ func GetOrderByRestaurant(res http.ResponseWriter, req *http.Request) {
 
 func PostOrder(res http.ResponseWriter, req *http.Request) {
 	HandleMessage([]string{"order-id", "soundfile"}, res, req, func(params map[string]string) interface{} {
+		// prepare query
 		getQuery := make(map[string]string)
 		getQuery["id"] = params["order-id"]
-		resp := helper.HttpGet(orderApiUrl + "/order", getQuery)
+		// prepare headers
+		headers := make(map[string]string)
+		headers["Access-Token"] = req.Header.Get("Access-Token")
+		resp := helper.HttpGet(orderApiUrl + "/order", headers, getQuery)
 		var orderItem order
 		json.Unmarshal(resp, &orderItem)
 

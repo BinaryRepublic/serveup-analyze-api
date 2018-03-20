@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-type orderApi struct {
+type api struct {
 	Host		string
 	Port		int
 }
@@ -16,7 +16,8 @@ type soundFiles struct {
 	Type		string
 }
 type environment struct {
-	OrderApi	orderApi
+	OrderApi	api
+	AuthApi		api
 	SoundFiles	soundFiles
 }
 type config struct {

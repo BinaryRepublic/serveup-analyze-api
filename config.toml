@@ -2,14 +2,20 @@
     [dev.orderApi]
         host = "http://order-api-dev"
         port = 3000
+    [dev.authApi]
+        host = "http://auth-api-dev"
+        port = 4000
     [dev.soundFiles]
         path = "/go/soundfiles/"
         type = "wav"
 
 [prod]
     [prod.orderApi]
-        host = "http://order-api"
+        host = "http://order-api-prod"
         port = 3000
+    [prod.authApi]
+        host = "http://auth-api-prod"
+        port = 4000
     [prod.soundFiles]
         path = "/go/soundfiles/"
         type = "wav"

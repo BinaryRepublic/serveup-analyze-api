@@ -3,7 +3,6 @@ package controller
 import (
 	"net/http"
 	"fmt"
-	"middleware"
 	"encoding/json"
 	"github.com/gorilla/mux"
 	"helper"
@@ -16,10 +15,6 @@ var Config = helper.ReadConfig()
 type controller func(formParams map[string]string) interface{}
 
 func HandleMessage(required []string, res http.ResponseWriter, req *http.Request, controllerFn controller) {
-
-	// go through middleware
-	middleware.HttpHeaders(res, req, "json")
-
 	// parse query, form and json params to map[string]string
 	params := make(map[string]string)
 	params = parseForm(params, req)
@@ -95,8 +90,7 @@ func validateRequest(params map[string]string, required []string, request *http.
 
 func FileResponse(res http.ResponseWriter, req *http.Request, filePath string) bool {
 	if _, err := os.Stat(filePath); err == nil {
-		middleware.HttpHeadersContentType(res, req, "file")
-
+		res.Header().Set("Content-Type", "application/octet-stream")
 		filePathSplit := strings.Split(filePath, "/")
 		fileName := filePathSplit[len(filePathSplit)-1]
 
