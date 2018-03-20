@@ -1,3 +1,5 @@
+noAuthRoutes = ["/soundfile"]
+
 [dev]
     [dev.orderApi]
         host = "http://order-api-dev"

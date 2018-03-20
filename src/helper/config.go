@@ -16,16 +16,18 @@ type soundFiles struct {
 	Type		string
 }
 type environment struct {
-	OrderApi	api
-	AuthApi		api
-	SoundFiles	soundFiles
+	OrderApi		api
+	AuthApi			api
+	SoundFiles		soundFiles
+	NoAuthRoutes	[]string
 }
 type config struct {
-	Dev 	environment
-	Prod 	environment
-	Local0 	environment
-	Local1 	environment
-	Local2 	environment
+	Dev 			environment
+	Prod 			environment
+	Local0 			environment
+	Local1 			environment
+	Local2 			environment
+	NoAuthRoutes	[]string
 }
 
 func ReadConfig() environment {
@@ -47,5 +49,6 @@ func ReadConfig() environment {
 	} else if os.Getenv("LOCAL2") != "" {
 		configEnv = config.Local2
 	}
+	configEnv.NoAuthRoutes = config.NoAuthRoutes
 	return configEnv
 }
