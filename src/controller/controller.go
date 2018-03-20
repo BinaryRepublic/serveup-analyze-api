@@ -90,6 +90,7 @@ func validateRequest(params map[string]string, required []string, request *http.
 
 func FileResponse(res http.ResponseWriter, req *http.Request, filePath string) bool {
 	if _, err := os.Stat(filePath); err == nil {
+		res.Header().Del("Content-Type")
 		res.Header().Set("Content-Type", "application/octet-stream")
 		filePathSplit := strings.Split(filePath, "/")
 		fileName := filePathSplit[len(filePathSplit)-1]
