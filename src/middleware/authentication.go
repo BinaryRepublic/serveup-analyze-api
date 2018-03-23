@@ -11,7 +11,7 @@ import (
 var Config = helper.ReadConfig()
 
 type authResponse struct {
-	AccountId string `json:"accountId"`
+	ClientId string `json:"clientId"`
 }
 type errorResponse struct {
 	Error map[string]string `json:"error"`
@@ -42,7 +42,7 @@ func Authentication(next http.Handler) http.Handler {
 					var authResponseItem authResponse
 					json.Unmarshal(response, &authResponseItem)
 					// add accountId for authorization middleware
-					req.Header.Set("accountId", authResponseItem.AccountId)
+					req.Header.Set("accountId", authResponseItem.ClientId)
 					next.ServeHTTP(res, req)
 				} else {
 					res.WriteHeader(400)

@@ -31,15 +31,9 @@ func NewRouter() *mux.Router {
 
 var routes = Routes{
 	Route{
-		"PostOrder",
-		"POST",
-		"/order",
-		controller.PostOrder,
-	},
-	Route{
 		"GetOrder",
 		"GET",
-		"/order",
+		"/order/{id}",
 		controller.GetOrderById,
 	},
 	Route{
@@ -47,6 +41,12 @@ var routes = Routes{
 		"GET",
 		"/order/restaurant",
 		controller.GetOrderByRestaurant,
+	},
+	Route{
+		"PostOrder",
+		"POST",
+		"/order",
+		controller.PostOrder,
 	},
 	Route{
 		"GetSoundFile",
