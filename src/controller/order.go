@@ -10,20 +10,25 @@ import (
 
 var orderApiUrl = Config.OrderApi.Host + ":" + strconv.Itoa(Config.OrderApi.Port)
 
-type orderItem struct {
+type drinkItem struct {
 	Id		string			`json:"id"`
 	Name	string			`json:"name"`
 	Size	int				`json:"size"`
 	Nb		int				`json:"nb"`
 }
+type serviceItem struct {
+	Id		string			`json:"id"`
+	Name	string			`json:"name"`
+}
 type order struct {
-	Id            string      `json:"id"`
-	Timestamp     string      `json:"timestamp"`
-	Items         []orderItem `json:"items"`
-	VoiceDeviceId string      `json:"voicedevice-id"`
-	RestaurantId  string      `json:"restaurant-id"`
-	Status        int         `json:"status"`
-	SoundFilePath string      `json:"soundfile-path"`
+	Id            string      	`json:"id"`
+	Timestamp     string      	`json:"timestamp"`
+	Drinks        []drinkItem 	`json:"drinks"`
+	Services      []serviceItem	`json:"services"`
+	VoiceDeviceId string      	`json:"voicedeviceId"`
+	RestaurantId  string      	`json:"restaurantId"`
+	Status        int         	`json:"status"`
+	SoundFilePath string      	`json:"soundfile-path"`
 }
 
 func GetOrderById(res http.ResponseWriter, req *http.Request) {
