@@ -37,7 +37,7 @@ func HttpSaveFile(res http.ResponseWriter, req *http.Request, path string) (file
 	return f.Name()
 }
 
-func HttpGet(url string, params map[string]string) []byte {
+func HttpGet(url string, headers map[string]string, params map[string]string) []byte {
 	// create query
 	queryStr := "?"
 	for key, value := range params {
@@ -49,7 +49,16 @@ func HttpGet(url string, params map[string]string) []byte {
 		queryStr = ""
 	}
 	url = url + queryStr
-	response, err := http.Get(url)
+
+	req, _ := http.NewRequest("GET", url, nil)
+	req.Header.Set("Content-Type", "application/json")
+	// set custom headers
+	for key, value := range headers {
+		req.Header.Set(key, value)
+	}
+
+	client := &http.Client{}
+	response, err := client.Do(req)
 	if  err != nil {
 		fmt.Println(err)
 	} else {
@@ -66,11 +75,16 @@ func HttpGet(url string, params map[string]string) []byte {
 	return nil
 }
 
-func HttpPost(url string, params map[string]interface{}) []byte {
+func HttpPost(url string, headers map[string]string, params map[string]interface{}) []byte {
 	jsonStr, _ := json.Marshal(params)
 	jsonStr = []byte(jsonStr)
 	req, _ := http.NewRequest("POST", url, bytes.NewBuffer(jsonStr))
+
 	req.Header.Set("Content-Type", "application/json")
+	// set custom headers
+	for key, value := range headers {
+		req.Header.Set(key, value)
+	}
 
 	client := &http.Client{}
 	response, err := client.Do(req)

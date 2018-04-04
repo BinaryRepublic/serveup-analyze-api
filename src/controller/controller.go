@@ -3,23 +3,24 @@ package controller
 import (
 	"net/http"
 	"fmt"
-	"middleware"
 	"encoding/json"
 	"github.com/gorilla/mux"
 	"helper"
 	"strings"
 	"os"
+	"library"
 )
 
 var Config = helper.ReadConfig()
 
-type controller func(formParams map[string]string) interface{}
+type controller func(formParams map[string]string) ControllerResult
+
+type ControllerResult struct {
+	Success		interface{}
+	Error		library.ErrorObj
+}
 
 func HandleMessage(required []string, res http.ResponseWriter, req *http.Request, controllerFn controller) {
-
-	// go through middleware
-	middleware.HttpHeaders(res, req, "json")
-
 	// parse query, form and json params to map[string]string
 	params := make(map[string]string)
 	params = parseForm(params, req)
@@ -30,25 +31,36 @@ func HandleMessage(required []string, res http.ResponseWriter, req *http.Request
 	missing := validateRequest(params, required, req)
 
 	if len(missing) == 0 {
-		jsonResult := controllerFn(params)
-		if jsonResult != false {
-			if jsonResult == nil {
-				jsonResult = map[string]string{}
-			}
+		controllerRes := controllerFn(params)
+		if controllerRes.Error.Msg == "" {
 			// 200 SUCCESS
-			json.NewEncoder(res).Encode(jsonResult)
+			library.Log(200, req.Method, req.RequestURI, "", "")
+			json.NewEncoder(res).Encode(controllerRes.Success)
 		} else {
 			if res.Header().Get("Content-Type") == "application/json" {
 				// 500 INTERNAL
-				res.WriteHeader(http.StatusInternalServerError)
+				controllerRes.Error.Type = "INTERNAL_SERVER_ERROR"
+				library.LogError(500, req.Method, req.RequestURI, controllerRes.Error)
+				res.WriteHeader(500)
+				json.NewEncoder(res).Encode(controllerRes.Error.Msg)
 			}
 		}
 	} else {
+		missingStr := ""
 		for _, missingItem := range missing {
-			fmt.Println("missing value: ", missingItem)
+			missingStr += missingItem + ", "
 		}
+		missingStr = missingStr[:len(missingStr)-2]
+
+		fmt.Println("missing value: ", missingStr)
 		// 500 INTERNAL
-		res.WriteHeader(http.StatusInternalServerError)
+		errorObj := library.ErrorObj{
+			Type: "BAD_REQUEST",
+			Msg: "missing value: " + missingStr,
+		}
+		library.LogError(400, req.Method, req.RequestURI, errorObj)
+		res.WriteHeader(400)
+		json.NewEncoder(res).Encode(errorObj)
 	}
 }
 func parseForm(params map[string]string, request *http.Request) (newParams map[string]string) {
@@ -95,13 +107,16 @@ func validateRequest(params map[string]string, required []string, request *http.
 
 func FileResponse(res http.ResponseWriter, req *http.Request, filePath string) bool {
 	if _, err := os.Stat(filePath); err == nil {
-		middleware.HttpHeadersContentType(res, req, "file")
-
+		res.Header().Del("Content-Type")
+		res.Header().Set("Content-Type", "application/octet-stream")
 		filePathSplit := strings.Split(filePath, "/")
 		fileName := filePathSplit[len(filePathSplit)-1]
 
 		res.Header().Set("Content-Disposition", "attachment; filename=\""+fileName+"\"")
 		http.ServeFile(res, req, filePath)
+
+		library.Log(200, req.Method, req.RequestURI, "", "")
+
 		return true
 	}
 	return false
