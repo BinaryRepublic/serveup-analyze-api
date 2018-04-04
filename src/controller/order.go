@@ -32,12 +32,13 @@ type order struct {
 }
 
 func GetOrderById(res http.ResponseWriter, req *http.Request) {
-	HandleMessage([]string{"id"}, res, req, func(params map[string]string) interface{} {
+	HandleMessage([]string{"id"}, res, req, func(params map[string]string) ControllerResult {
+		var result ControllerResult
 		// prepare headers
 		headers := make(map[string]string)
 		headers["Access-Token"] = req.Header.Get("Access-Token")
 		// send request
-		res := helper.HttpGet(orderApiUrl + "/order", headers, helper.HttpQueryParams(req))
+		res := helper.HttpGet(orderApiUrl + "/order", headers, params)
 		var orderItem order
 		json.Unmarshal(res, &orderItem)
 		if orderItem.Id != "" {
@@ -45,18 +46,21 @@ func GetOrderById(res http.ResponseWriter, req *http.Request) {
 			if _, err := os.Stat(soundFilePath); err == nil {
 				orderItem.SoundFilePath = helper.SoundFileUrl(req, orderItem.Id)
 			}
-			return orderItem
+			result.Success = orderItem
+			return result
 		}
-		return false
+		result.Error.Msg = "Invalid orderId: " + params["id"]
+		return result
 	})
 }
 func GetOrderByRestaurant(res http.ResponseWriter, req *http.Request) {
-	HandleMessage([]string{"restaurant-id"}, res, req, func(params map[string]string) interface{} {
+	HandleMessage([]string{"restaurant-id"}, res, req, func(params map[string]string) ControllerResult {
+		var result ControllerResult
 		// prepare headers
 		headers := make(map[string]string)
 		headers["Access-Token"] = req.Header.Get("Access-Token")
 		// send request
-		res := helper.HttpGet(orderApiUrl + "/order/restaurant", headers, helper.HttpQueryParams(req))
+		res := helper.HttpGet(orderApiUrl + "/order/restaurant", headers, params)
 		if res != nil {
 			var orders []order
 			json.Unmarshal(res, &orders)
@@ -67,15 +71,18 @@ func GetOrderByRestaurant(res http.ResponseWriter, req *http.Request) {
 					order.SoundFilePath = helper.SoundFileUrl(req, orders[index].Id)
 				}
 			}
-			return orders
+			result.Success = orders
+			return result
 		} else {
-			return false
+			result.Error.Msg = "Invalid restaurantId: " + params["restaurant-id"]
+			return result
 		}
 	})
 }
 
 func PostOrder(res http.ResponseWriter, req *http.Request) {
-	HandleMessage([]string{"order-id", "soundfile"}, res, req, func(params map[string]string) interface{} {
+	HandleMessage([]string{"order-id", "soundfile"}, res, req, func(params map[string]string) ControllerResult {
+		var result ControllerResult
 		// prepare query
 		getQuery := make(map[string]string)
 		getQuery["id"] = params["order-id"]
@@ -93,10 +100,12 @@ func PostOrder(res http.ResponseWriter, req *http.Request) {
 				filename := helper.HttpSaveFile(res, req, fullPath)
 				if filename != "" {
 					orderItem.SoundFilePath = helper.SoundFileUrl(req, params["order-id"])
-					return orderItem
+					result.Success = orderItem
+					return result
 				}
 			}
 		}
-		return false
+		result.Error.Msg = "Invalid orderId: " + params["order-id"]
+		return result
 	})
 }

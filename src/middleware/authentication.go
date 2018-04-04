@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"library"
 )
 
 var Config = helper.ReadConfig()
@@ -14,7 +15,7 @@ type authResponse struct {
 	ClientId string `json:"clientId"`
 }
 type errorResponse struct {
-	Error map[string]string `json:"error"`
+	Error library.ErrorObj `json:"error"`
 }
 
 func Authentication(next http.Handler) http.Handler {
@@ -47,20 +48,22 @@ func Authentication(next http.Handler) http.Handler {
 				} else {
 					res.WriteHeader(400)
 					var authError errorResponse
-					authError.Error = map[string]string{
-						"type": "ACCESS_TOKEN_INVALID",
-						"msg":  "accessToken is invalid",
+					authError.Error = library.ErrorObj{
+						Type: "ACCESS_TOKEN_INVALID",
+						Msg:  "accessToken is invalid",
 					}
+					library.LogError(400, req.Method, req.RequestURI, authError.Error)
 					json.NewEncoder(res).Encode(authError)
 				}
 			} else {
 				// no access token given
 				res.WriteHeader(400)
 				var authError errorResponse
-				authError.Error = map[string]string{
-					"type": "ACCESS_TOKEN_MISSING",
-					"msg":  "Please send a valid access-token in the request header.",
+				authError.Error = library.ErrorObj{
+					Type: "ACCESS_TOKEN_MISSING",
+					Msg:  "Please send a valid access-token in the request header.",
 				}
+				library.LogError(400, req.Method, req.RequestURI, authError.Error)
 				json.NewEncoder(res).Encode(authError)
 			}
 		}
